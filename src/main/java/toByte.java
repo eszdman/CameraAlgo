@@ -2,7 +2,7 @@ public class toByte {
     public static byte[] start(short[] in, int bl){
         byte[] output = new byte[in.length];
         for (int i = 0; i < output.length; i++) {
-            if(in[i] > 0) output[i] = (byte) (in[i]/bl);
+            output[i] = (byte) (Math.max(in[i],0)/bl);
         }
         return output;
     }

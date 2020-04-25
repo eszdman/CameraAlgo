@@ -45,7 +45,7 @@ public class OpenClUtils {
         // The platform, device type and device number
         // that will be used
         final int platformIndex = 0;
-        final long deviceType = CL_DEVICE_TYPE_GPU;
+        final long deviceType = CL_DEVICE_TYPE_ALL;
         final int deviceIndex = 0;
         // Enable exceptions and subsequently omit error checks in this sample
         CL.setExceptionsEnabled(true);

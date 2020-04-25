@@ -1,60 +1,72 @@
-import Neural.UseNetwork;
-import org.opencv.core.Algorithm;
-import org.opencv.osgi.OpenCVInterface;
-import sun.java2d.pipe.AAShapePipe;
+import javax.swing.*;
+import java.awt.*;
+import java.lang.management.GarbageCollectorMXBean;
 
-import javax.rmi.CORBA.Util;
-import java.awt.font.GraphicAttribute;
-import java.io.IOException;
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         ConvertImageToByteArray Read = new ConvertImageToByteArray();
-        //Read.directory = "C:\\Users\\eszdman\\IdeaProjects\\CameraAlgo\\test";
-        Read.directory = "H:\\Camera\\test";
-        Read.name= "0";
-        byte[] t1 = Read.getRGB(); //read 0.jpg
+        Read.directory = "E:\\Camera\\test";
         ShotUtils utils = new ShotUtils();
-        utils.Init();
+        utils.images = new short[2][];
+        Read.name= "shift7.jpg";
+        utils.images[utils.imInd++] = byteTo.start(Read.getRGB(),64);
+        Read.name= "shift8.jpg";
+        utils.images[utils.imInd++] = byteTo.start(Read.getRGB(),64);
         utils.width = Read.width;
         utils.height = Read.height;
-        LightCycle2 Cycle = new LightCycle2();
         Wavelet wavelet = new Wavelet();
-        Cycle.dir = Read.directory;
-        for(int i = 0; i<1; i++) Cycle.output = Cycle.Run(i); //read 0.jpg 1.jpg 2.jpg...
-       short[] GrayScale =  GetGray.GrayArray(Cycle.output);
-       short[] color = GetColorCoefficients.GetColorCoeff(GrayScale, Cycle.output);
-       color = MedianFilter.Run(color,utils,2,10);
-       //GrayScale = MedianFilter.Run(GrayScale,Read.width,1,9);
-       //color = Blur.Run(color, utils,2,15);
-       //color = WaveletDenoise.Run(color,utils,37.5,12,2.0);
-        int Rmin = 5;
-        int Rmax = 25;
-        //Cycle.output = GrayScale;
-        wavelet.Run(Cycle.output,utils,3,75,6);
-        short[][] wav = (short[][])wavelet.waves;
-        short[] Activation = ActivationMask.Get(GetGray.GrayArray(wav[3]));
+        utils.Init();
+        JFrame frame = new JFrame();//init
+        Gr Gui = new Gr();
+        Gui.size = 500;
+        frame.add(Gui);
+        frame.setSize(Gui.size+15, Gui.size+40);
+        frame.setVisible(true);
+        //utils.images[0] = Resizer.Upsampling(Resizer.Binning(utils.images[0],utils,25),utils,25);
+        short[] orig1 = new short[utils.images[0].length];
+        orig1 = utils.images[0];
+        short[] orig2 = utils.images[1];
+        //wavelet.Run(utils.images[0],utils,2,20,3);
+        /*short[] gray = GetGray.GrayArray(utils.images[0]);
+        short[] col = GetColorCoefficients.GetColorCoeff(gray,utils.images[0]);
+        gray = FastBlur.Run(gray,utils,1,25);
+        col = MedianFilter.Run(col,utils,1,25);
+        utils.images[0] = WayBackColor.GetImage(gray,col);
+        utils.images[0] = Normalize.Run(utils.images[0],utils);*/
+        //utils.images[0] = MedianFilter.Run(utils.images[0],utils,1,13);
+        //utils.images[0] = Blur.Run(utils.images[0],utils,2,30);
+        //utils.images[0] = Ops.Run(utils.images[0],"*1.10");
+        //orig1 = Ops.Run(orig1,"- 16384*0.10");
+        //orig1 = Ops.Run(orig1,"*(1.0/0.90)");
+        //utils.images[0] = Ops.Run(utils.images[0],"- 16384*0.10");
+        //utils.images[0] = Ops.Run(utils.images[0],"*(1.0/0.90)");
+        //orig1 = Ops.Run(Ops.Run(utils.images[0],Ops.Run(Ops.Run(orig1,"*(1.0/0.90)"),"- 16384*0.10"),"-"),orig1,"+");
+        //utils.images[1] = FastBlur.SharpMask(utils.images[1],utils,2,15);
+        //short[][] wav = (short[][])wavelet.waves;
+        //Read.getImage(toByte.start(orig1,16),"wavelet");
+        //ShiftFinder.GetDetectMatrix(utils,25,4, shift);
+        Point shift =  ShiftFinder.Run(utils, 25);System.out.println("ShiftFinder = "+ shift);
+        shift = ShiftFinder.Run(utils,shift, 5,10);System.out.println("ShiftFinder = "+ shift);
+        shift = ShiftFinder.Run(utils,shift, 1,100);System.out.println("ShiftFinder = "+ shift);
+        //Point[] added = new Point[4];
+        //Point[] added = ShiftFinder.Run(utils);
 
-        Read.getImage(toByte.start(Activation,64),"ActivationEdge");
-
-        wav[1] = Blur.Run(wav[1],wav[5],Activation);
-        short[] ActivationCol = ActivationMask.Get(wav[2]);
-        color = Blur.Run(color, ActivationCol, utils, 4, 25);
-        wav[0] = Ops.Run(wav[0], "*1.5"); //FastOperations
-        wav[1] = Ops.Run(wav[1], "*1.1");
-        wav[2] = Ops.Run(wav[2], "*1");
-        /*wav[3] = Ops.Run(wav[3], "*1+4000");
-        wav[4] = Ops.Run(wav[4], "*1+4000");
-        wav[5] = Ops.Run(wav[5], "*1+4000");*/
-        for(int i = 0; i<wav.length; i++){
-            Read.getImage(toByte.start(Ops.Run(wav[i],"+4000"),64),"Wave"+i);
+        int x = 0;
+        int y = 0;
+        for(int i =0; i<4; i++){
+         //   x += added[2].x;
+         //   y += added[2].y;
         }
-
-        GrayScale = GetGray.GrayArray((short[])wavelet.Image());wavelet = null;
-        //GrayScale = Ops.Run(GrayScale, "*0+4000");
-        Cycle.output = WayBackColor.GetImage(GrayScale, color);
-        //Cycle.output = (short[])wavelet.Image();
-        //Cycle.output = Blur.Run(Cycle.output,Read.width,1,150.1);
-       Cycle.output = Normalize.Run(Cycle.output, utils);
-        Read.getImage(toByte.start(Cycle.output,64));
+        x/=4;
+        y/=4;
+        //System.out.println("ShiftFinder = "+ added[0]);
+        //System.out.println("ShiftFinder = "+ added[1]);
+        //System.out.println("ShiftFinder = "+ added[2]);
+        //System.out.println("ShiftFinder = "+ added[3]);
+        //shift = new Point(shift.x+x,shift.y+y);
+        utils.images[0] = FrameStacking.Run(orig1,orig2,utils,new Point(shift.x,shift.y));
+        //utils.images[0] = Denoise.Denoise(utils.images[0],Read.width);
+        Read.getImage(toByte.start(utils.images[0],64),"png",false);
+        Gui.setImg(Read.buffer);
     }
 }

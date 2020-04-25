@@ -23,11 +23,7 @@ public class LightCycle2 {
         int num = 3;
         Read.name = String.valueOf(name);
         byte[] in = new byte[0];
-        try {
             in = Read.getRGB();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         short[] t = new short[in.length];
         for (int i = 0; i < in.length; i++) {
             t[i] = (short)((in[i] & 0xff)*64);

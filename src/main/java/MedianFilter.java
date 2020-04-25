@@ -5,6 +5,7 @@ import sun.awt.image.ShortInterleavedRaster;
 import static org.jocl.CL.*;
 
 public class MedianFilter {
+    static String cancellation ="if((temp2/Radi)/(temp[(Radi-1)/2]+1) >= 0.8 || (temp2/Radi)/(temp[(Radi-1)/2]+1) <= 0.80)";
     public static short[] Hr(short[] in, ShotUtils utils, int power, int Rad) {
         //boolean res = true;
         //if(power == 1) res = false;
@@ -24,11 +25,18 @@ public class MedianFilter {
                         "double temp2 = 0;"+
                         "\t  for(int w=0; w<Radi; w++){\t\n" +
                         //"\t\t temp += B[(x+w-offset)*3+t]*D[w];" +
-                        "\t\t temp[w] = B[(x+w-offset)*3+t];" +
+                        "\t\t temp[w] = B[((x+w-offset)*3+t)];" +
+                        "     temp2+=temp[w];" +
                         // "else temp += B[(x+w-offset)*3+t]*D[w+1-Radi];" +
                         "\t\t//temp += B[(x-w - width*h)*3+t]*A[k];\n" +
                         "  }\n" +
-                        "for(int b =0; b<Radi; b++) for(int i =0; i<Radi; i++) if(temp[i-1] > temp[i]){temp2 = temp[i]; temp[i] = temp[i-1]; temp[i-1] = temp2; }" +
+                        cancellation+
+                        "for(int b =0; b<Radi; b++) for(int i =0; i<Radi; i++) if(temp[i-1] > temp[i])" +
+                        "{" +
+                        "temp2 = temp[i];" +
+                        " temp[i] = temp[i-1];" +
+                        " temp[i-1] = temp2;" +
+                        " }" +
                         "  C[(x)*3+t] = (temp[(Radi-1)/2]);\n" +
                         " }\n" +
                         "}\n";
@@ -78,14 +86,20 @@ public class MedianFilter {
                         "for(int t = 0; t<3; t++)\n" +
                         " {\n" +
                         " short offset = (Radi-1)/2;" +
-                        "double temp2 = 0;"+
+                        "double temp2 = 0;" +
                         "  for(int h=0; h<Radi; h++) {\n" +
                         //"\t\t y2 = h - (Radi-1)/2;\n" +
                         "\t\t temp[h] = B[(x + width*(-h+offset))*3+t];" +
+                        "     temp2+=temp[h];" +
                         //"else temp += B[(x + width*(-h+offset))*3+t]*D[h+1-Radi]; \n" +
                         "\t\t//temp += B[(x-w - width*h)*3+t]*A[k];\n" +
                         "  }\n" +
-                        "for(int b =0; b<Radi; b++) for(int i =0; i<Radi; i++) if(temp[i-1] > temp[i]){temp2 = temp[i]; temp[i] = temp[i-1]; temp[i-1] = temp2; }" +
+                        cancellation+
+                        "for(int b =0; b<Radi; b++) for(int i =0; i<Radi; i++) if(temp[i-1] > temp[i]){" +
+                        "temp2 = temp[i];" +
+                        " temp[i] = temp[i-1];" +
+                        " temp[i-1] = temp2;" +
+                        " }" +
                         "  C[(x)*3+t] = (temp[(Radi-1)/2]);\n" +
                         " }\n" +
                         "}\n";

@@ -142,7 +142,7 @@ public class Resizer {
         clEnqueueReadBuffer(Clu.commandQueue, Clu.memObjects[2], CL_TRUE, 0,
                 inter.length * Sizeof.cl_short, srcC, 0, null, null);
         Clu.ReleaseAll(3);
-        return Blur.Run(inter,utils,1,power);
+        return inter;
            // return inter;
         } else return in;
     }

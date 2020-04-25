@@ -14,15 +14,21 @@ class ConvertImageToByteArray {
     boolean hasAlphaChannel;
     String directory;
     String name;
-    public byte[] getRGB() throws IOException {
-        BufferedImage image = ImageIO.read(new File(directory, name + ".jpg"));
+    BufferedImage buffer;
+    public byte[] getRGB() {
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(new File(directory, name));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         height = image.getHeight();
         width = image.getWidth();
         hasAlphaChannel = image.getAlphaRaster() != null;
         final byte[] pixels = (((DataBufferByte) image.getRaster().getDataBuffer()).getData());
         return pixels;
     }
-    public void getImage(byte[] pixels) throws IOException {
+    public void getImage(byte[] pixels, String type, boolean t){
         BufferedImage resultImage=new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
         if (hasAlphaChannel) {
             final int pixelLength = 4;
@@ -54,9 +60,14 @@ class ConvertImageToByteArray {
                 }
             }
     }
-        ImageIO.write(resultImage, "jpg", new File(directory,"imageresult.jpg"));
+        try {
+            buffer = resultImage;
+            ImageIO.write(resultImage, type, new File(directory,"imageresult."+type));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    public void getImage(byte[] pixels, String name) throws IOException {
+    public void getImage(byte[] pixels, String name) {
         BufferedImage resultImage=new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
         if (hasAlphaChannel) {
             final int pixelLength = 4;
@@ -88,11 +99,16 @@ class ConvertImageToByteArray {
                 }
             }
         }
-        ImageIO.write(resultImage, "jpg", new File(directory,name+".jpg"));
+        buffer = resultImage;
+        try {
+            ImageIO.write(resultImage, "jpg", new File(directory,name+".jpg"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public void ImageAuto(int w,int h, byte[]in) throws IOException {
         width = w;
         height = h;
-        getImage(in);
+        getImage(in,"jpg",false);
     }
 }

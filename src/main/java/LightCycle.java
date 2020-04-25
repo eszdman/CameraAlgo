@@ -82,7 +82,7 @@ public class LightCycle {
             ts[i] = (byte) output[i];
 
         }
-        Read.getImage(ts);
+        Read.getImage(ts,"jpg",false);
     }
 }
 
