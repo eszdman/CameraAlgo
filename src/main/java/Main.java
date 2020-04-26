@@ -45,9 +45,17 @@ public class Main {
         //short[][] wav = (short[][])wavelet.waves;
         //Read.getImage(toByte.start(orig1,16),"wavelet");
         //ShiftFinder.GetDetectMatrix(utils,25,4, shift);
-        Point shift =  ShiftFinder.Run(utils, 25);System.out.println("ShiftFinder = "+ shift);
-        shift = ShiftFinder.Run(utils,shift, 5,10);System.out.println("ShiftFinder = "+ shift);
-        shift = ShiftFinder.Run(utils,shift, 1,100);System.out.println("ShiftFinder = "+ shift);
+
+        //Point shift =  ShiftFinder.Run(utils, 25,0,0);System.out.println("ShiftFinder = "+ shift);
+
+        //shift = ShiftFinder.Run(utils,shift, 5,10);System.out.println("ShiftFinder = "+ shift);
+        //shift = ShiftFinder.Run(utils,shift, 1,100);System.out.println("ShiftFinder = "+ shift);
+
+        Point[] points = ShiftFinder.GetEISPoints(utils);
+        for (Point point : points) System.out.println(point);
+        utils.images[0] = EsStackingAlgo2.Run(0,1,utils,points);
+
+        //EsStackingAlgo.Run(0,1,utils);
         //Point[] added = new Point[4];
         //Point[] added = ShiftFinder.Run(utils);
 
@@ -64,7 +72,7 @@ public class Main {
         //System.out.println("ShiftFinder = "+ added[2]);
         //System.out.println("ShiftFinder = "+ added[3]);
         //shift = new Point(shift.x+x,shift.y+y);
-        utils.images[0] = FrameStacking.Run(orig1,orig2,utils,new Point(shift.x,shift.y));
+        //utils.images[0] = FrameStacking.Run(orig1,orig2,utils,new Point(shift.x,shift.y));
         //utils.images[0] = Denoise.Denoise(utils.images[0],Read.width);
         Read.getImage(toByte.start(utils.images[0],64),"png",false);
         Gui.setImg(Read.buffer);

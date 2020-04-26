@@ -33,14 +33,14 @@ public class ShiftFinder {
             }
         return (diff/cnt);
     }
-    private static double CmpPhotoFaster(short[]in1, short[]in2, Point shift, int width) {
+    private static double CmpPhotoFaster(short[]in1, short[]in2, Point shift, Point shift2, int width) {
         int height = (in1.length / (width * 3));
         double diff = 0;
         int ind;
         int ind2;
         int cnt = 1;
-        int x = (width * 3) / 2;
-        int y = height / 2;
+        int x = ((width * 3) / 2)+shift2.x;
+        int y = (height / 2)+shift2.y;
         int rad = Math.min(width * 3, height)/4;
         for (int l = 0; l < 3; l++)
         {
@@ -55,7 +55,7 @@ public class ShiftFinder {
     }
         return (diff/(cnt));
     }
-public static Point Run(ShotUtils utils, int mul){
+public static Point Run(ShotUtils utils, int mul, double shiftx, double shifty){
     Point output = new Point();
     short[][]in = new short[utils.images.length][];
     double diff = Double.MAX_VALUE;
@@ -63,10 +63,11 @@ public static Point Run(ShotUtils utils, int mul){
     for(int i = 0; i<2; i++) in[i] = Resizer.Binning(utils.images[i],utils,mul);
     int width = utils.width/mul;
     int height = utils.height/mul;
+    Point shift2 = new Point((int)(width*shiftx),(int)(height*shifty));
     Point find = new Point();
-    for(find.y = -height/2; find.y<height/2; find.y++)
-        for(find.x = -width/2; find.x<width/2; find.x++) {
-            temp = CmpPhotoFaster(in[0], in[1], find, width);
+    for(find.y = -height/4 ; find.y<height/4; find.y++)
+        for(find.x = -width/4; find.x<width/4; find.x++) {
+            temp = CmpPhotoFaster(in[0], in[1], find, shift2, width);
             //System.out.println("Cmp Out:"+temp);
             if (temp < diff) {
                 diff = temp;
@@ -75,7 +76,21 @@ public static Point Run(ShotUtils utils, int mul){
         }
     return output;
 }
-    public static Point Run(ShotUtils utils,Point prev, int mul, int mul2){
+public static Point[] GetEISPoints(ShotUtils utils)
+{
+    Point[] points = new Point[4];
+    points[0] = Run(utils,25,0,0);
+    points[1] = Run(utils,25,0.35,0);
+    points[2] = Run(utils,25,0,0.35);
+    points[3] = Run(utils,25,0.35,0.35);
+    for(int i =0; i<points.length; i++) System.out.println(points[i]);
+    points[0] = Run(utils,points[0],12,25,0,0);
+    points[1] = Run(utils,points[1],12,25,0.25,0);
+    points[2] = Run(utils,points[2],12,25,0,0.25);
+    points[3] = Run(utils,points[3],12,25,0.25,0.25);
+    return points;
+}
+    public static Point Run(ShotUtils utils,Point prev, int mul, int mul2, double shiftx, double shifty){
         Point output = new Point();
         short[][]in = new short[utils.images.length][];
         double diff = Double.MAX_VALUE;
@@ -83,10 +98,11 @@ public static Point Run(ShotUtils utils, int mul){
         for(int i = 0; i<2; i++) in[i] = Resizer.Binning(utils.images[i],utils,mul);
         int width = utils.width/mul;
         int height = utils.height/mul;
+        Point shift2 = new Point((int)(height*shifty),(int)(width*shiftx));
         Point find = new Point();
         for(find.y = (-height/mul2 + prev.y)/mul; find.y<(height/mul2+ prev.y)/mul; find.y++)
             for(find.x = (-width/mul2+ prev.x)/mul; find.x<(width/mul2 + prev.x)/mul; find.x++) {
-                temp = CmpPhotoFaster(in[0], in[1], find, width);
+                temp = CmpPhotoFaster(in[0], in[1], find,shift2, width);
                 if (temp < diff) {
                     diff = temp;
                     output = new Point(find.x*mul, find.y*mul);
