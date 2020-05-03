@@ -36,21 +36,20 @@ public class ShiftFinder {
     private static double CmpPhotoFaster(short[]in1, short[]in2, Point shift, Point shift2, int width) {
         int height = (in1.length / (width * 3));
         double diff = 0;
-        int ind;
         int ind2;
         int cnt = 1;
         int x = ((width * 3) / 2)+shift2.x;
         int y = (height / 2)+shift2.y;
         int rad = Math.min(width * 3, height)/4;
-        for (int l = 0; l < 3; l++)
+        for (int l = 0; l < 24; l++)
         {
             rad/=2;
             for (int i = 0; i < rad * Math.PI * 2; i++) {
-                int x2 = x + (int) (Math.cos(((double) (i)) / rad) * (rad));
+                int x2 = x + (int) (Math.cos(((double) (i)) / rad) * (rad*3));
                 int y2 = y + (int) (Math.sin(((double) (i)) / rad) * rad);
                 int ind1 = y2 * width * 3 + x2;
-                ind2 = ind1 + (shift.y * width * 3) + shift.x * 3;
-                if (ind2 >= 0 && ind2 < in1.length && ind1 < in1.length) {diff += Math.abs(in1[ind1] - in2[ind2]);cnt++;}
+                ind2 = ind1 + (shift.y * width * 3) + shift.x*3;
+                if (ind2 >= 0 && ind2 < in1.length && ind1 < in1.length) {diff += (in1[ind1] - in2[ind2])*(in1[ind1] - in2[ind2]);cnt++;}
             }
     }
         return (diff/(cnt));
@@ -63,10 +62,10 @@ public static Point Run(ShotUtils utils, int mul, double shiftx, double shifty){
     for(int i = 0; i<2; i++) in[i] = Resizer.Binning(utils.images[i],utils,mul);
     int width = utils.width/mul;
     int height = utils.height/mul;
-    Point shift2 = new Point((int)(width*shiftx),(int)(height*shifty));
+    Point shift2 = new Point((int)(width*3*shiftx),(int)(height*shifty));
     Point find = new Point();
-    for(find.y = -height/4 ; find.y<height/4; find.y++)
-        for(find.x = -width/4; find.x<width/4; find.x++) {
+    for(find.y = -height/8 ; find.y<height/8; find.y++)
+        for(find.x = -width/8; find.x<width/8; find.x++) {
             temp = CmpPhotoFaster(in[0], in[1], find, shift2, width);
             //System.out.println("Cmp Out:"+temp);
             if (temp < diff) {
@@ -85,9 +84,9 @@ public static Point[] GetEISPoints(ShotUtils utils)
     points[3] = Run(utils,25,0.35,0.35);
     for(int i =0; i<points.length; i++) System.out.println(points[i]);
     points[0] = Run(utils,points[0],12,25,0,0);
-    points[1] = Run(utils,points[1],12,25,0.25,0);
-    points[2] = Run(utils,points[2],12,25,0,0.25);
-    points[3] = Run(utils,points[3],12,25,0.25,0.25);
+    points[1] = Run(utils,points[1],12,25,0.35,0);
+    points[2] = Run(utils,points[2],12,25,0,0.35);
+    points[3] = Run(utils,points[3],12,25,0.35,0.35);
     return points;
 }
     public static Point Run(ShotUtils utils,Point prev, int mul, int mul2, double shiftx, double shifty){

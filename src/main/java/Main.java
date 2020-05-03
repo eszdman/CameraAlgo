@@ -8,9 +8,9 @@ public class Main {
         Read.directory = "E:\\Camera\\test";
         ShotUtils utils = new ShotUtils();
         utils.images = new short[2][];
-        Read.name= "shift7.jpg";
+        Read.name= "shift9.jpg";
         utils.images[utils.imInd++] = byteTo.start(Read.getRGB(),64);
-        Read.name= "shift8.jpg";
+        Read.name= "shift10.jpg";
         utils.images[utils.imInd++] = byteTo.start(Read.getRGB(),64);
         utils.width = Read.width;
         utils.height = Read.height;
@@ -18,7 +18,7 @@ public class Main {
         utils.Init();
         JFrame frame = new JFrame();//init
         Gr Gui = new Gr();
-        Gui.size = 500;
+        Gui.size = 800;
         frame.add(Gui);
         frame.setSize(Gui.size+15, Gui.size+40);
         frame.setVisible(true);
