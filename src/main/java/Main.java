@@ -8,9 +8,9 @@ public class Main {
         Read.directory = "E:\\Camera\\test";
         ShotUtils utils = new ShotUtils();
         utils.images = new short[2][];
-        Read.name= "shift9.jpg";
+        Read.name= "shift7.jpg";
         utils.images[utils.imInd++] = byteTo.start(Read.getRGB(),64);
-        Read.name= "shift10.jpg";
+        Read.name= "shift8.jpg";
         utils.images[utils.imInd++] = byteTo.start(Read.getRGB(),64);
         utils.width = Read.width;
         utils.height = Read.height;
@@ -51,10 +51,12 @@ public class Main {
         //shift = ShiftFinder.Run(utils,shift, 5,10);System.out.println("ShiftFinder = "+ shift);
         //shift = ShiftFinder.Run(utils,shift, 1,100);System.out.println("ShiftFinder = "+ shift);
 
-        Point[] points = ShiftFinder.GetEISPoints(utils);
-        for (Point point : points) System.out.println(point);
-        utils.images[0] = EsStackingAlgo2.Run(0,1,utils,points);
+        //Point[] points = ShiftFinder.GetEISPoints(utils);
+        //for (Point point : points) System.out.println(point);
+        //utils.images[0] = EsStackingAlgo2.Run(0,1,utils,points);
 
+        Point[] pp = EsShiftFinder.Run(utils);
+        System.out.println(pp);
         //EsStackingAlgo.Run(0,1,utils);
         //Point[] added = new Point[4];
         //Point[] added = ShiftFinder.Run(utils);

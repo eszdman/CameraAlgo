@@ -56,10 +56,12 @@ public class EsStackingAlgo2 {
         p[0].setLocation(0,0);//LU
         p[1].setLocation(0,0);//
         p[2].setLocation(0,0);//
-        p[3].setLocation(-200,0);//
+        p[3].setLocation(100,0);//
         //p[3].setLocation(-50,-100);
-        //p[1].setLocation(20,0);
-
+        //p[0].setLocation(24,10);
+        //p[2].setLocation(24,12);
+        //p[1].setLocation(18,12);
+        //p[3].setLocation(27,12);
 
         p[1].x+=width;//1
         p[2].y+=utils.height;//2
@@ -73,43 +75,30 @@ public class EsStackingAlgo2 {
         //vec13.div(utils.height);
         vec13.div(width);
         MyPoint vec24 = new MyPoint(vec2.x-vec4.x,vec2.y-vec4.y);
-        vec24.div(width);
-        //vec24.div(utils.height);
-
+        vec24.div(((utils.height)));
         System.out.println("v1:"+vec1);
         System.out.println("v2:"+vec2);
         System.out.println("v3:"+vec3);
         System.out.println("v4:"+vec4);
         System.out.println("v13:"+vec13);
         System.out.println("v24:"+vec24);
-        Clu.programSource = "#define cords(x,y)(y*"+utils.width*3+" + x*3)" +
-                "" +
-                "" +
-                "" +
-                "" +
+        Clu.programSource = "#define cords(x0,y0)(y0*"+utils.width*3+" + x0*3)" +
                 "\nint ConvertCoords(int x, int y) {" +
                 "float2 vec1 = (float2)("+vec1.x+" , "+vec1.y+");" + //X vector
                 "float2 vec2 = (float2)("+vec2.x+" , "+vec2.y+");" + //Y vector
                 "float2 vec13 = (float2)("+vec13.x+" , "+vec13.y+");" +
                 "float2 vec24 = (float2)("+vec24.x+" , "+vec24.y+");" +
-                //"int x2 = (int)( ((vec1.x*x+vec13.x*y*x))  +  (vec2.x*y + vec24.x*y*x));" +
-                //"int y2 = (int)( ((vec1.y*x+vec13.y*y*x))  +  (vec2.y*y + vec24.y*y*x));" +
-                "float2 vecy = (float2)((vec2.x + vec24.x*x), (vec2.y + vec24.y*x));" +
-                "vecy/= native_sqrt(vecy.x*vecy.x + vecy.y+vecy.y);" +
-                "vecy*= y;"+
-                "int x2 = (int)( ((vec1.x*x))  +  ( (vec2.x + vec24.x*x)*y));" +
-                "int y2 = (int)( ((vec1.y*x))  +  ( (vec2.y + vec24.y*x)*y));" +
+                "int x2 = (int)( ((vec1.x*x))  +  ((vec2.x - vec24.x*x)*y));" +
+                "int y2 = (int)( ((vec1.y*x))  +  ((vec2.y - vec24.y*x)*y));" +
                 "x2+="+p[0].x+";" +
                 "y2+="+p[0].y+";" +
-                "if(x2>="+width+"){x2 = "+(width-1)+";}"+
-                "if(y2>="+utils.height+"){y2 = "+(utils.height-1)+";}" +
-                "if(x2<0){x2 = 0;}"+
-                "if(y2<0){y2 = 0;}" +
-                //"int x2 = (vec1.x)*x;" +
-                //"int y2 = (vec2.y)*y;" +
-                //"return cords((vec1.x+vec13.x*x)*x + (vec2.x+vec24.x*y)*y , (vec1.y+vec13.y*x)*x +(vec2.y+vec24.y*y)*y);" +
-
+                //"if(x2>="+width+"){x2 = "+(width-1)+";}"+
+                //"if(y2>="+utils.height+"){y2 = "+(utils.height-1)+";}" +
+                //"if(x2<0){x2 = 0;}"+
+                //"if(y2<0){y2 = 0;}" +
+                ""+
                 "return cords(x2,y2);" +
+                "" +
                 "}" +
                 "" +
                 "" +
@@ -117,23 +106,18 @@ public class EsStackingAlgo2 {
                 "const int x = get_global_id(0);" +
                 "const int y = get_global_id(1);" +
                 //"for(int t =0; t<3;t++) C[cords(x,y)+t] = (B[ConvertCoords(x,y)+t]+A[cords(x,y)+t])/2;" +
-                "for(int t =0; t<3;t++) C[cords(x,y)+t] = (B[ConvertCoords(x,y)+t])/1;" +
+                "int x2 = x;" +
+                "int y2 = y;" +
+                "if(x2>"+width+") x2 = "+(width-1)+";" +
+                "if(y2>"+utils.height+") y2 = "+(utils.height-1)+";" +
+                "for(int t =0; t<3;t++) {" +
+                "C[ConvertCoords(x,y)+t] = (B[cords(x2,y2)+t])/1;" +
+                "//C[ConvertCoords(x,y)+t] += (A[cords(x,y)+t])/2;\n" +
+                "}" +
                 "if(x<"+(p[0].x+10)+" && y<"+(p[0].y+10)+") C[cords(x,y)] = 0;" +
                 "if(x>"+(p[1].x-10)+" && y<"+(p[1].y+10)+") C[cords(x,y)] = 0;" +
                 "if(x<"+(p[2].x+10)+" && y>"+(p[2].y-10)+") C[cords(x,y)] = 0;" +
                 "if(x>"+(p[3].x-10)+" && y>"+(p[3].y-10)+") C[cords(x,y)] = 0;" +
-                "" +
-                "" +
-                "" +
-                "" +
-                "" +
-                "" +
-                "" +
-                "" +
-                "" +
-                "" +
-                "" +
-                "" +
                 "}";
         Clu.InitCl("EsStacking2");
         Pointer srcA = Pointer.to(utils.images[from]);
@@ -147,7 +131,7 @@ public class EsStackingAlgo2 {
         Clu.memObjects[2] = clCreateBuffer(Clu.context,
                 CL_MEM_READ_WRITE, Sizeof.cl_short  * utils.images[from].length, null, null);
         Clu.setArg(3);
-        long global_work_size[] = new long[]{utils.width, utils.height};
+        long global_work_size[] = new long[]{utils.width+900, utils.height+900};
         long local_work_size[] = new long[]{1,1};
         clEnqueueNDRangeKernel(Clu.commandQueue, Clu.kernel, 2, null,
                 global_work_size, local_work_size, 0, null, null);
